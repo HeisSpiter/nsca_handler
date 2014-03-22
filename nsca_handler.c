@@ -83,8 +83,6 @@ static void handle_file(const char * file_path) {
      * NSCA is capable of handing more
      */
     soft_assert(feof(data));
-    if (!feof(data))
-        syslog(LOG_INFO, "%s", file_path);
 
     /* Close file */
     soft_assert(fclose(data) == 0);

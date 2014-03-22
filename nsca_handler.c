@@ -28,7 +28,10 @@
 #include <string.h>
 #include <dirent.h>
 #include <signal.h>
+/* BUG: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=473595 */
+#ifndef S_SPLINT_S
 #include <unistd.h>
+#endif
 #include <poll.h>
 #include <errno.h>
 
@@ -82,7 +85,7 @@ static void handle_file(const char * file_path) {
      * We don't care about the rest, it's even not sure that
      * NSCA is capable of handing more
      */
-    soft_assert(feof(data));
+    soft_assert(feof(data) != 0);
 
     /* Close file */
     soft_assert(fclose(data) == 0);
@@ -140,7 +143,7 @@ static void handle_current_files(void) {
             /* Build complete path */
             strncpy(complete_name, NSCA_OUTPUT_DIR, MAX_FILE_LENGTH);
             strncat(complete_name, dir_entry->d_name, MAX_FILE_LENGTH - sizeof(NSCA_OUTPUT_DIR));
-            complete_name[MAX_FILE_LENGTH - 1] = 0;
+            complete_name[MAX_FILE_LENGTH - 1] = '\0';
 
             /* And handle file */
             handle_file(complete_name);
@@ -152,7 +155,7 @@ static void handle_current_files(void) {
     }
 
     /* That's all! */
-    closedir(nsca_dir_s);
+    (void)closedir(nsca_dir_s);
 
     return;
 }
@@ -205,7 +208,7 @@ int main(int argc, char ** argv) {
     }
 
     /* Quit session */
-    umask(0);
+    (void)umask(0);
     if (setsid() < 0) {
         exit(EXIT_FAILURE);
     }
@@ -216,9 +219,9 @@ int main(int argc, char ** argv) {
     }
 
     /* Get rid of useless descriptors */
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
+    (void)close(STDIN_FILENO);
+    (void)close(STDOUT_FILENO);
+    (void)close(STDERR_FILENO);
 
     /* Fork again to handle files that would already exist */
     initial_work = fork();
@@ -243,7 +246,7 @@ int main(int argc, char ** argv) {
     /* We'll watch files created in the directory */
     nsca_dir_fd = inotify_add_watch(inotify_fd, NSCA_OUTPUT_DIR, IN_CREATE);
     if (nsca_dir_fd < 0) {
-        close(inotify_fd);
+        (void)close(inotify_fd);
         exit(EXIT_FAILURE);
     }
 
@@ -256,7 +259,7 @@ int main(int argc, char ** argv) {
         fds[0].fd = inotify_fd;
         fds[0].events = POLLIN;
         fds[0].revents = 0;
-        event = poll(fds, sizeof(fds) / sizeof(fds[0]), timeout);
+        event = poll(fds, 1, timeout);
         if (event < 0) {
             /* Did one of our children died? Then keep going */
             if (errno == EINTR) {
@@ -290,7 +293,7 @@ int main(int argc, char ** argv) {
         /* Get to the next file */
     }
 
-    close(nsca_dir_fd);
-    close(inotify_fd);
+    (void)close(nsca_dir_fd);
+    (void)close(inotify_fd);
     exit(EXIT_SUCCESS);
 }

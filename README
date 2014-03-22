@@ -1,4 +1,13 @@
-nsca_handler
-============
+nsca_handler is a tool that has been designed to run with Icinga/Nagios in case of a distributed/redundant monitoring. It prevents from calling send_nsca right from Icinga/Nagios, and thus adding a deadtime in case of connection limitation. This delegates treatment to parallel application.
 
-A tool for managing data to be sent using NSCA
+Its behaviour is simple. It will read directory that contains files each time a change occurs and will send everything to the other host using nsca_send.
+
+nsca_handler does not take any argument (edit source code...). Run it, it will fork in background. Kill it with signals.
+
+Before you actually compile and deploy the application, please properly set these parameters in code:
+NSCA_SEND_CMD
+NSCA_OUTPUT_DIR
+
+This has been specifically designed for the ReactOS Foundation infrastructure, but we are open to suggestions and patches :-).
+
+-- Pierre Schweitzer <pierre@reactos.org>

@@ -1,0 +1,7 @@
+bin_PROGRAMS = nsca_handler
+
+AM_CFLAGS = $(INTI_CFLAGS)
+
+nsca_handler_SOURCES = nsca_handler.c
+nsca_handler_LDADD = $(INTI_LIBS)
+nsca_handler_CFLAGS=-Werror -W -Wall -Wextra -ansi -pedantic

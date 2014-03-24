@@ -10,4 +10,6 @@ NSCA_OUTPUT_DIR
 
 This has been specifically designed for the ReactOS Foundation infrastructure, but we are open to suggestions and patches :-).
 
+Pieces of documentation and code can be found on the Wiki at: https://github.com/HeisSpiter/nsca_handler/wiki.
+
 -- Pierre Schweitzer <pierre@reactos.org>

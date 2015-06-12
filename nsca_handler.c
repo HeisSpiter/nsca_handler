@@ -1,4 +1,4 @@
-	/*
+/*
 * nsca_handler - A tool for managing data to be sent using NSCA
 * Copyright (C) 2014 Pierre Schweitzer <pierre@reactos.org>
 *

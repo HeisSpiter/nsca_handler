@@ -1,4 +1,4 @@
-/*
+	/*
 * nsca_handler - A tool for managing data to be sent using NSCA
 * Copyright (C) 2014 Pierre Schweitzer <pierre@reactos.org>
 *
@@ -80,12 +80,6 @@ static void handle_file(const char * file_path) {
         (void)fclose(data);
         return;
     }
-
-    /* Normally, at that point, we should have reached EOF
-     * We don't care about the rest, it's even not sure that
-     * NSCA is capable of handing more
-     */
-    soft_assert(feof(data) != 0);
 
     /* Close file */
     soft_assert(fclose(data) == 0);

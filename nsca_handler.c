@@ -70,14 +70,16 @@ static void handle_file(const char * file_path) {
     data = fopen(file_path, "r");
     if (data == NULL)
     {
-        /* It failed, so what? Shall we delete the file? */
+        /* Delete the file, the system might be in bad shape */
+        unlink(file_path);
         return;
     }
 
     if (fgets(buffer, MAX_SIZE, data) != buffer)
     {
-        /* It failed, so what? Shall we delete the file? */
+        /* Delete the file, the system might be in bad shape */
         (void)fclose(data);
+        unlink(file_path);
         return;
     }
 

@@ -21,6 +21,7 @@
 #include <sys/inotify.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/file.h>
 #include <syslog.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -75,6 +76,23 @@ static void handle_file(const char * file_path) {
         return;
     }
 
+    /* Attempt to lock the file so that no other worker will interfere */
+    if (flock(fileno(data), LOCK_EX | LOCK_NB) != 0)
+    {
+        int saved_errno = errno;
+
+        /* Another work may have locked it, give up! */
+        (void)fclose(data);
+
+        if (saved_errno != EWOULDBLOCK)
+        {
+            /* It's likely not locked by another worker, delete the file */
+            unlink(file_path);
+        }
+
+        return;
+    }
+
     if (fgets(buffer, MAX_SIZE, data) != buffer)
     {
         /* Delete the file, the system might be in bad shape */
@@ -83,7 +101,7 @@ static void handle_file(const char * file_path) {
         return;
     }
 
-    /* Close file */
+    /* Close file - this releases exclusive lock */
     soft_assert(fclose(data) == 0);
     /* And unlink */
     soft_assert(unlink(file_path) == 0);
